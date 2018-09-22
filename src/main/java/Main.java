@@ -5,18 +5,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) {
         Path dataDir = Paths.get(args[0]);
+        Path finishedDir = Paths.get("./results");
         Stream<Path> inputFiles = null;
 
         try {
-            inputFiles = Files.walk(dataDir)
-                    .filter(s -> s.toString().endsWith(".txt"));
+            Set<String> finishedFiles = Files.walk(finishedDir)
+//                    .filter(s -> s.toString().endsWith(".json"))
+                    .map(path -> path.getFileName().toString())
+                    .collect(Collectors.toSet());
 
+            inputFiles = Files.walk(dataDir)
+                    .filter(s -> s.toString().endsWith(".txt"))
+                    .filter(s -> !finishedFiles.contains(s.getFileName().toString()));
 
         } catch (IOException e) {
             System.err.println(e);
@@ -24,7 +31,6 @@ public class Main {
 
         // Process each file
         RelationExtractor extractor = new RelationExtractor();
-
         inputFiles.forEach(extractor::process);
 
 //
