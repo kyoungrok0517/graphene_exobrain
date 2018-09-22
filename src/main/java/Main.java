@@ -28,7 +28,7 @@ public class Main {
         } catch (IOException e) {
             System.err.println(e);
         }
-
+        
         // Process each file
         RelationExtractor extractor = new RelationExtractor();
         inputFiles.forEach(extractor::process);
