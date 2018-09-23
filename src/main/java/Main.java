@@ -32,10 +32,25 @@ public class Main {
         }
     }
 
+    public static void writeOutput(String result, Path finishedDir) {
+        String[] fnameAndResult = result.split("\t");
+        String fname = fnameAndResult[0];
+        String json = fnameAndResult[1];
+        String output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", ".json");
+
+        // write
+        try (FileWriter outWriter = new FileWriter(output_path); PrintWriter outPrinter = new PrintWriter(outWriter)) {
+            outPrinter.println(json);
+            outPrinter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
         Path dataDir = Paths.get(args[0]);
         Path finishedDir = Paths.get(args[1]);
-        int numThreads = Integer.getInteger(args[2]);
+        int numThreads = Integer.parseInt(args[2]);
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
         if (!finishedDir.toFile().exists()) {
@@ -86,9 +101,19 @@ public class Main {
             }
             System.out.println("\n--------------\n\n\nFiles left: " + queue.size() + "\n------------\n");
             try {
-                Thread.sleep(100000); // Once a 10 minute, print the remanining file count
+                Thread.sleep(50000); // Once a 5 minute, print the remanining file count
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+
+            // Save current outputs
+            synchronized (outs) {
+                for (String s : outs) {
+                    writeOutput(s, finishedDir);
+                }
+                while (outs.size() > 0) {
+                    outs.remove();
+                }
             }
 
         }
@@ -97,18 +122,7 @@ public class Main {
 
         synchronized (outs) {
             for (String s : outs) {
-                String[] fnameAndResult = s.split("\t");
-                String fname = fnameAndResult[0];
-                String result = fnameAndResult[1];
-                String output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", ".json");
-
-                // write
-                try (FileWriter outWriter = new FileWriter(output_path);
-                        PrintWriter outPrinter = new PrintWriter(outWriter)) {
-                    outPrinter.print(result);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                writeOutput(s, finishedDir);
 
             }
         }
