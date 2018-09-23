@@ -23,6 +23,7 @@ public class Main {
 
     public static LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<>();
     public static LinkedBlockingQueue<String> outs = new LinkedBlockingQueue<>();
+    public static LinkedBlockingQueue<String> inProgressQueue = new LinkedBlockingQueue<>();
 
     public static void putIntoQueue(String inputFile) {
         try {
@@ -50,6 +51,18 @@ public class Main {
         }
     }
 
+    public static void writeInProgress(LinkedBlockingQueue<String> inProgress) {
+        try (FileWriter queueWriter = new FileWriter("./in_progress.txt");
+                PrintWriter queuePrinter = new PrintWriter(queueWriter)) {
+            for (String s : inProgress) {
+                queuePrinter.println(s);
+            }
+            queuePrinter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
         Path dataDir = Paths.get(args[0]);
         Path finishedDir = Paths.get(args[1]);
@@ -74,7 +87,7 @@ public class Main {
         List<Future<?>> futures = new ArrayList<>();
 
         for (int i = 0; i < numThreads; i++) {
-            futures.add(executor.submit(new GrapheneWorker(queue, outs)));
+            futures.add(executor.submit(new GrapheneWorker(queue, outs, inProgressQueue)));
         }
 
         // Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -102,13 +115,13 @@ public class Main {
             if (allDone) {
                 break;
             }
-            System.out.println("\n--------------\n\n\nSentences left: " + queue.size() + "\n------------\n");
+            // System.out.println("\n--------------\n\n\nSentences left: " + queue.size() +
+            // "\n------------\n");
             try {
-                Thread.sleep(20000); // periodically print the remanining file count
+                Thread.sleep(20000); // periodically save the result
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
             // Save current outputs
             synchronized (outs) {
                 writeOutput(outs, finishedDir);
@@ -116,13 +129,21 @@ public class Main {
                     outs.remove();
                 }
             }
-
+            // Save in progress list
+            synchronized (inProgressQueue) {
+                writeInProgress(inProgressQueue);
+            }
         }
 
         executor.shutdown();
 
+        // Save result
         synchronized (outs) {
             writeOutput(outs, finishedDir);
+        }
+        // Save in progress list
+        synchronized (inProgressQueue) {
+            writeInProgress(inProgressQueue);
         }
 
         System.out.println("Done");

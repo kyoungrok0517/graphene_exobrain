@@ -12,17 +12,23 @@ public class GrapheneWorker implements Runnable {
     Graphene graphene;
     LinkedBlockingQueue<String> queue;
     LinkedBlockingQueue<String> outQueue;
+    LinkedBlockingQueue<String> inProgressQueue;
 
-    public GrapheneWorker(LinkedBlockingQueue<String> queue, LinkedBlockingQueue<String> outQueue) {
+    public GrapheneWorker(LinkedBlockingQueue<String> queue, LinkedBlockingQueue<String> outQueue,
+            LinkedBlockingQueue<String> inProgressQueue) {
         this.graphene = new Graphene();
         this.queue = queue;
         this.outQueue = outQueue;
+        this.inProgressQueue = inProgressQueue;
     }
 
     @Override
     public void run() {
         while (!this.queue.isEmpty()) {
-            Path filePath = Paths.get(queue.remove());
+            String filePathStr = queue.remove();
+            Path filePath = Paths.get(filePathStr);
+            // set the file as in progress
+            this.inProgressQueue.add(filePathStr);
 
             try (BufferedReader br = new BufferedReader(new FileReader(new File(filePath.toString())))) {
                 String line;
@@ -41,25 +47,13 @@ public class GrapheneWorker implements Runnable {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
                 }
                 br.close();
+                // mark the file as done
+                this.inProgressQueue.remove(filePathStr);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            // try {
-            // String content = new
-            // String(Files.readAllBytes(Paths.get(filePath.toString())));
-            // String json = this.graphene.doRelationExtraction(content, true,
-            // false).serializeToJSON();
-            // String fileName = filePath.getFileName().toString();
-            // outQueue.add(fileName + '\t' + json);
-            // } catch (JsonProcessingException e) {
-            // e.printStackTrace();
-            // } catch (Exception e) {
-            // e.printStackTrace();
-            // }
         }
     }
 
