@@ -91,6 +91,11 @@ public class Main {
             inProgressFiles.stream().map(f -> Paths.get(f).getFileName().toString())
                     .map(f -> f.replace(".txt", ".json")).map(f -> Paths.get(finishedDir.toString(), f))
                     .forEach(Main::deleteResultFile);
+
+            System.out.println("Removing the following unfinished files");
+            for (String f : inProgressFiles) {
+                System.out.println(f);
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -119,6 +124,7 @@ public class Main {
                     .collect(Collectors.toSet());
             Stream<String> inputFiles = Files.walk(dataDir).filter(s -> s.toString().endsWith(".txt"))
                     .filter(s -> !finishedFiles.contains(s.getFileName().toString())).map(p -> p.toString());
+            System.out.println("Skipping " + finishedFiles.size() + " files.");
             // put into queue
             inputFiles.forEach(Main::putIntoQueue);
         } catch (IOException e) {
