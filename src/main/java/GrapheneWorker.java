@@ -27,7 +27,10 @@ public class GrapheneWorker implements Runnable {
                 String line;
                 String json;
                 String fileName;
-                while ((line = br.readLine()) != null) {
+                while ((line = br.readLine().trim()) != null) {
+                    if (line.isEmpty()) {
+                        continue;
+                    }
                     json = this.graphene.doRelationExtraction(line, true, false).serializeToJSON();
                     fileName = filePath.getFileName().toString();
                     outQueue.add(fileName + '\t' + json);

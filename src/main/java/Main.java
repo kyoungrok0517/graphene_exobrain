@@ -32,19 +32,21 @@ public class Main {
         }
     }
 
-    public static void writeOutput(String result, Path finishedDir) {
-        String[] fnameAndResult = result.split("\t");
-        String fname = fnameAndResult[0];
-        String json = fnameAndResult[1];
-        String output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", ".json");
+    public static void writeOutput(LinkedBlockingQueue<String> outs, Path finishedDir) {
+        for (String result : outs) {
+            String[] fnameAndResult = result.split("\t");
+            String fname = fnameAndResult[0];
+            String json = fnameAndResult[1];
+            String output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", ".json");
 
-        // write
-        try (FileWriter outWriter = new FileWriter(output_path);
-                PrintWriter outPrinter = new PrintWriter(outWriter, true)) {
-            outPrinter.println(json);
-            outPrinter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
+            // write
+            try (FileWriter outWriter = new FileWriter(output_path, true);
+                    PrintWriter outPrinter = new PrintWriter(outWriter)) {
+                outPrinter.println(json);
+                outPrinter.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -109,9 +111,7 @@ public class Main {
 
             // Save current outputs
             synchronized (outs) {
-                for (String s : outs) {
-                    writeOutput(s, finishedDir);
-                }
+                writeOutput(outs, finishedDir);
                 while (outs.size() > 0) {
                     outs.remove();
                 }
@@ -122,10 +122,7 @@ public class Main {
         executor.shutdown();
 
         synchronized (outs) {
-            for (String s : outs) {
-                writeOutput(s, finishedDir);
-
-            }
+            writeOutput(outs, finishedDir);
         }
 
         System.out.println("Done");
