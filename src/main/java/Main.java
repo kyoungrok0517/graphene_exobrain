@@ -71,8 +71,9 @@ public class Main {
     public static void deleteResultFile(Path f) {
         try {
             Files.delete(f);
+            System.out.println(f);
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -88,14 +89,10 @@ public class Main {
                 }
             }
             // remove the files from result folder
+            System.out.println("Removing the following unfinished files");
             inProgressFiles.stream().map(f -> Paths.get(f).getFileName().toString())
                     .map(f -> f.replace(".txt", ".json")).map(f -> Paths.get(finishedDir.toString(), f))
                     .forEach(Main::deleteResultFile);
-
-            System.out.println("Removing the following unfinished files");
-            for (String f : inProgressFiles) {
-                System.out.println(f);
-            }
         } catch (FileNotFoundException e) {
 
         } catch (IOException e) {
