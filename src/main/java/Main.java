@@ -97,7 +97,7 @@ public class Main {
                 System.out.println(f);
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
