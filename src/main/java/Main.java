@@ -104,7 +104,7 @@ public class Main {
             }
             System.out.println("\n--------------\n\n\nSentences left: " + queue.size() + "\n------------\n");
             try {
-                Thread.sleep(10000); // Once a 1 minute, print the remanining file count
+                Thread.sleep(20000); // periodically print the remanining file count
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
