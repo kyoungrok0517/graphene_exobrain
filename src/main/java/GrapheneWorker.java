@@ -34,7 +34,8 @@ public class GrapheneWorker implements Runnable {
                 String line;
                 String json;
                 String fileName;
-                while ((line = br.readLine().trim()) != null) {
+                while ((line = br.readLine()) != null) {
+                    line = line.trim();
                     if (line.isEmpty()) {
                         continue;
                     }
