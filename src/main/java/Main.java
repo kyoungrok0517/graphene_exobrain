@@ -49,10 +49,13 @@ public class Main {
                 e.printStackTrace();
             }
         }
+        while (outs.size() > 0) {
+            outs.remove();
+        }
     }
 
-    public static void writeInProgress(LinkedBlockingQueue<String> inProgress) {
-        try (FileWriter queueWriter = new FileWriter("./in_progress.txt");
+    public static void writeInProgress(LinkedBlockingQueue<String> inProgress, Path inProgressPath) {
+        try (FileWriter queueWriter = new FileWriter(inProgressPath.toString());
                 PrintWriter queuePrinter = new PrintWriter(queueWriter)) {
             for (String s : inProgress) {
                 queuePrinter.println(s);
@@ -63,10 +66,17 @@ public class Main {
         }
     }
 
+    // public static Set<String> getInProgressFiles() {
+    // try (BufferedReader br = new BufferedReader(new FileReader(new
+    // File(filePath.toString())))) {
+    // }
+    // }
+
     public static void main(String[] args) {
         Path dataDir = Paths.get(args[0]);
         Path finishedDir = Paths.get(args[1]);
         int numThreads = Integer.parseInt(args[2]);
+        Path inProgressPath = Paths.get("./in_progress.txt");
         ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
         if (!finishedDir.toFile().exists()) {
@@ -90,22 +100,22 @@ public class Main {
             futures.add(executor.submit(new GrapheneWorker(queue, outs, inProgressQueue)));
         }
 
-        // Runtime.getRuntime().addShutdownHook(new Thread() {
-        // public void run() {
-        // try {
-        // synchronized (outs) {
-        // FileWriter outWriter = new FileWriter("./all_news_tgt.txt", true);
-        // PrintWriter outPrinter = new PrintWriter(outWriter);
-        // for (String s : outs) {
-        // outPrinter.println(s);
-        // }
-        // outPrinter.close();
-        // }
-        // } catch (Exception e) {
-        // e.printStackTrace();
-        // }
-        // }
-        // });
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                try {
+                    // Save result
+                    synchronized (outs) {
+                        writeOutput(outs, finishedDir);
+                    }
+                    // Save in progress list
+                    synchronized (inProgressQueue) {
+                        writeInProgress(inProgressQueue, inProgressPath);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         while (true) {
             boolean allDone = true;
@@ -125,13 +135,10 @@ public class Main {
             // Save current outputs
             synchronized (outs) {
                 writeOutput(outs, finishedDir);
-                while (outs.size() > 0) {
-                    outs.remove();
-                }
             }
             // Save in progress list
             synchronized (inProgressQueue) {
-                writeInProgress(inProgressQueue);
+                writeInProgress(inProgressQueue, inProgressPath);
             }
         }
 
@@ -143,7 +150,7 @@ public class Main {
         }
         // Save in progress list
         synchronized (inProgressQueue) {
-            writeInProgress(inProgressQueue);
+            writeInProgress(inProgressQueue, inProgressPath);
         }
 
         System.out.println("Done");
