@@ -1,4 +1,4 @@
-import com.typesafe.config.ConfigException;
+
 import org.lambda3.graphene.core.Graphene;
 import org.lambda3.graphene.core.relation_extraction.model.RelationExtractionContent;
 
