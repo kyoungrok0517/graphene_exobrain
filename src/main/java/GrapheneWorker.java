@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.LinkedBlockingQueue;
+import edu.stanford.nlp.util.RuntimeInterruptedException;
 
 public class GrapheneWorker implements Runnable {
 
@@ -31,9 +32,16 @@ public class GrapheneWorker implements Runnable {
                     if (line.isEmpty()) {
                         continue;
                     }
-                    json = this.graphene.doRelationExtraction(line, true, false).serializeToJSON();
-                    fileName = filePath.getFileName().toString();
-                    outQueue.add(fileName + '\t' + json);
+                    try {
+                        json = this.graphene.doRelationExtraction(line, true, false).serializeToJSON();
+                        fileName = filePath.getFileName().toString();
+                        outQueue.add(fileName + '\t' + json);
+                    } catch (RuntimeInterruptedException e) {
+                        System.err.println("Error: " + filePath.getFileName().toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 }
                 br.close();
             } catch (Exception e) {
