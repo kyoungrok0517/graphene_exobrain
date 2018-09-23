@@ -2,6 +2,8 @@ import org.lambda3.graphene.core.relation_extraction.model.RelationExtractionCon
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -66,11 +68,35 @@ public class Main {
         }
     }
 
-    // public static Set<String> getInProgressFiles() {
-    // try (BufferedReader br = new BufferedReader(new FileReader(new
-    // File(filePath.toString())))) {
-    // }
-    // }
+    public static void deleteResultFile(Path f) {
+        try {
+            Files.delete(f);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void removeInProgressFromResultDir(Path inProgressPath, Path finishedDir) {
+        List<String> inProgressFiles = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(new File(inProgressPath.toString())))) {
+            // read inProgress file list
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (!line.isEmpty()) {
+                    inProgressFiles.add(line);
+                }
+            }
+            // remove the files from result folder
+            inProgressFiles.stream().map(f -> Paths.get(f).getFileName().toString())
+                    .map(f -> f.replace(".txt", ".json")).map(f -> Paths.get(finishedDir.toString(), f))
+                    .forEach(Main::deleteResultFile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
         Path dataDir = Paths.get(args[0]);
@@ -83,9 +109,14 @@ public class Main {
             finishedDir.toFile().mkdir();
         }
 
+        // clean unfinished files from the result dir
+        removeInProgressFromResultDir(inProgressPath, finishedDir);
+
+        // Process
         try {
             Set<String> finishedFiles = Files.walk(finishedDir).filter(s -> s.toString().endsWith(".json"))
-                    .map(path -> path.getFileName().toString()).collect(Collectors.toSet());
+                    .map(path -> path.getFileName().toString()).map(f -> f.replace(".json", ".txt"))
+                    .collect(Collectors.toSet());
             Stream<String> inputFiles = Files.walk(dataDir).filter(s -> s.toString().endsWith(".txt"))
                     .filter(s -> !finishedFiles.contains(s.getFileName().toString())).map(p -> p.toString());
             // put into queue
