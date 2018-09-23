@@ -1,9 +1,7 @@
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.lambda3.graphene.core.Graphene;
-import org.lambda3.graphene.core.relation_extraction.model.RelationExtractionContent;
-
+import java.io.BufferedReader;
 import java.io.File;
-import java.nio.file.Files;
+import java.io.FileReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -25,16 +23,32 @@ public class GrapheneWorker implements Runnable {
         while (!this.queue.isEmpty()) {
             Path filePath = Paths.get(queue.remove());
 
-            try {
-                String content = new String(Files.readAllBytes(Paths.get(filePath.toString())));
-                String json = this.graphene.doRelationExtraction(content, true, false).serializeToJSON();
-                String fileName = filePath.getFileName().toString();
-                outQueue.add(fileName + '\t' + json);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
+            try (BufferedReader br = new BufferedReader(new FileReader(new File(filePath.toString())))) {
+                String line;
+                String json;
+                String fileName;
+                while ((line = br.readLine()) != null) {
+                    json = this.graphene.doRelationExtraction(line, true, false).serializeToJSON();
+                    fileName = filePath.getFileName().toString();
+                    outQueue.add(fileName + '\t' + json);
+                }
+                br.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            // try {
+            // String content = new
+            // String(Files.readAllBytes(Paths.get(filePath.toString())));
+            // String json = this.graphene.doRelationExtraction(content, true,
+            // false).serializeToJSON();
+            // String fileName = filePath.getFileName().toString();
+            // outQueue.add(fileName + '\t' + json);
+            // } catch (JsonProcessingException e) {
+            // e.printStackTrace();
+            // } catch (Exception e) {
+            // e.printStackTrace();
+            // }
         }
     }
 

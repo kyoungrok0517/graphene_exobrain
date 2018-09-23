@@ -39,7 +39,8 @@ public class Main {
         String output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", ".json");
 
         // write
-        try (FileWriter outWriter = new FileWriter(output_path); PrintWriter outPrinter = new PrintWriter(outWriter)) {
+        try (FileWriter outWriter = new FileWriter(output_path);
+                PrintWriter outPrinter = new PrintWriter(outWriter, true)) {
             outPrinter.println(json);
             outPrinter.flush();
         } catch (IOException e) {
@@ -99,9 +100,9 @@ public class Main {
             if (allDone) {
                 break;
             }
-            System.out.println("\n--------------\n\n\nFiles left: " + queue.size() + "\n------------\n");
+            System.out.println("\n--------------\n\n\nSentences left: " + queue.size() + "\n------------\n");
             try {
-                Thread.sleep(50000); // Once a 5 minute, print the remanining file count
+                Thread.sleep(10000); // Once a 1 minute, print the remanining file count
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
