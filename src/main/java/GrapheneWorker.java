@@ -40,7 +40,7 @@ public class GrapheneWorker implements Runnable {
                         continue;
                     }
                     try {
-                        json = this.graphene.doRelationExtraction(line, false, false).serializeToJSON();
+                        json = this.graphene.doRelationExtraction(line, false, true).serializeToJSON();
                         fileName = filePath.getFileName().toString();
                         outQueue.add(fileName + '\t' + json);
                     } catch (RuntimeInterruptedException e) {
