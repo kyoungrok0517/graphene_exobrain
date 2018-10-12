@@ -26,7 +26,7 @@ public class Main {
     public static LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<>();
     public static LinkedBlockingQueue<String> outs = new LinkedBlockingQueue<>();
     public static LinkedBlockingQueue<String> inProgressQueue = new LinkedBlockingQueue<>();
-    public static OUTPUT_EXT = ".tsv";
+    public static String OUTPUT_EXT = ".tsv";
 
     public static void putIntoQueue(String inputFile) {
         try {
