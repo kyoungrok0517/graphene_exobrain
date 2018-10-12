@@ -43,9 +43,9 @@ public class GrapheneWorker implements Runnable {
                         continue;
                     }
 
-                    columns = line.split("\\t")
-                    sentence = columns[0]
-                    paragraphId = columns[1]
+                    columns = line.split("\\t");
+                    sentence = columns[0];
+                    paragraphId = columns[1];
                     try {
                         json = this.graphene.doRelationExtraction(sentence, false, false).serializeToJSON();
                         fileName = filePath.getFileName().toString();
