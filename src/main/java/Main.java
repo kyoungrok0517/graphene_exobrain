@@ -52,7 +52,7 @@ public class Main {
             // write
             try (FileWriter outWriter = new FileWriter(output_path, true); 
                     PrintWriter outPrinter = new PrintWriter(outWriter)) {
-                outPrinter.println(json);
+                outPrinter.println(json + '\t' + paragraphId);
                 outPrinter.flush();
             } catch (IOException e) {
                 e.printStackTrace();
