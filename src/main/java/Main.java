@@ -26,6 +26,7 @@ public class Main {
     public static LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<>();
     public static LinkedBlockingQueue<String> outs = new LinkedBlockingQueue<>();
     public static LinkedBlockingQueue<String> inProgressQueue = new LinkedBlockingQueue<>();
+    public static OUTPUT_EXT = ".tsv";
 
     public static void putIntoQueue(String inputFile) {
         try {
@@ -46,7 +47,7 @@ public class Main {
             fname = columns[0];
             json = columns[1];
             paragraphId = columns[2];
-            output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", ".tsv");
+            output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", OUTPUT_EXT);
 
             // write
             try (FileWriter outWriter = new FileWriter(output_path, true); 
@@ -97,7 +98,7 @@ public class Main {
             // remove the files from result folder
             System.out.println("Removing the following unfinished files");
             inProgressFiles.stream().map(f -> Paths.get(f).getFileName().toString())
-                    .map(f -> f.replace(".txt", ".json")).map(f -> Paths.get(finishedDir.toString(), f))
+                    .map(f -> f.replace(".txt", OUTPUT_EXT)).map(f -> Paths.get(finishedDir.toString(), f))
                     .forEach(Main::deleteResultFile);
         } catch (FileNotFoundException e) {
 
@@ -122,8 +123,8 @@ public class Main {
 
         // Process
         try {
-            Set<String> finishedFiles = Files.walk(finishedDir).filter(s -> s.toString().endsWith(".json"))
-                    .map(path -> path.getFileName().toString()).map(f -> f.replace(".json", ".txt"))
+            Set<String> finishedFiles = Files.walk(finishedDir).filter(s -> s.toString().endsWith(OUTPUT_EXT))
+                    .map(path -> path.getFileName().toString()).map(f -> f.replace(OUTPUT_EXT, ".txt"))
                     .collect(Collectors.toSet());
             Stream<String> inputFiles = Files.walk(dataDir).filter(s -> s.toString().endsWith(".txt"))
                     .filter(s -> !finishedFiles.contains(s.getFileName().toString())).map(p -> p.toString());
