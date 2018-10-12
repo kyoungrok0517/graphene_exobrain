@@ -32,17 +32,24 @@ public class GrapheneWorker implements Runnable {
 
             try (BufferedReader br = new BufferedReader(new FileReader(new File(filePath.toString())))) {
                 String line;
-                String json;
                 String fileName;
+                String[] columns;
+                String sentence;
+                String paragraphId;
+                String json;
                 while ((line = br.readLine()) != null) {
                     line = line.trim();
                     if (line.isEmpty()) {
                         continue;
                     }
+
+                    columns = line.split("\\t")
+                    sentence = columns[0]
+                    paragraphId = columns[1]
                     try {
-                        json = this.graphene.doRelationExtraction(line, false, false).serializeToJSON();
+                        json = this.graphene.doRelationExtraction(sentence, false, false).serializeToJSON();
                         fileName = filePath.getFileName().toString();
-                        outQueue.add(fileName + '\t' + json);
+                        outQueue.add(fileName + '\t' + json + '\t' + paragraphId);
                     } catch (RuntimeInterruptedException e) {
                         System.err.println("Error: " + filePath.getFileName().toString());
                     } catch (Exception e) {

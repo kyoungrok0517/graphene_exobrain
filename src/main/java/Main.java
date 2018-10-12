@@ -36,15 +36,24 @@ public class Main {
     }
 
     public static void writeOutput(LinkedBlockingQueue<String> outs, Path finishedDir) {
+        String[] columns;
+        String fname;
+        String json;
+        String paragraphId;
+        String output_path;
+        FileWriter outWriter;
+        PrintWriter outPrinter;
         for (String result : outs) {
-            String[] fnameAndResult = result.split("\t");
-            String fname = fnameAndResult[0];
-            String json = fnameAndResult[1];
-            String output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", ".json");
+            columns = result.split("\t");
+            fname = columns[0];
+            json = columns[1];
+            paragraphId = columns[2]
+
+            output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", ".json");
 
             // write
-            try (FileWriter outWriter = new FileWriter(output_path, true);
-                    PrintWriter outPrinter = new PrintWriter(outWriter)) {
+            try (outWriter = new FileWriter(output_path, true); 
+                    outPrinter = new PrintWriter(outWriter)) {
                 outPrinter.println(json);
                 outPrinter.flush();
             } catch (IOException e) {
