@@ -41,8 +41,6 @@ public class Main {
         String json;
         String paragraphId;
         String output_path;
-        FileWriter outWriter;
-        PrintWriter outPrinter;
         for (String result : outs) {
             columns = result.split("\t");
             fname = columns[0];
@@ -52,8 +50,8 @@ public class Main {
             output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", ".json");
 
             // write
-            try (outWriter = new FileWriter(output_path, true); 
-                    outPrinter = new PrintWriter(outWriter)) {
+            try (FileWriter outWriter = new FileWriter(output_path, true); 
+                    PrintWriter outPrinter = new PrintWriter(outWriter)) {
                 outPrinter.println(json);
                 outPrinter.flush();
             } catch (IOException e) {
