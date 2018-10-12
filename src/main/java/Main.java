@@ -42,11 +42,10 @@ public class Main {
         String paragraphId;
         String output_path;
         for (String result : outs) {
-            columns = result.split("\t");
+            columns = result.split("\\t");
             fname = columns[0];
             json = columns[1];
             paragraphId = columns[2];
-
             output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", ".json");
 
             // write
