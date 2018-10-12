@@ -47,7 +47,7 @@ public class Main {
             columns = result.split("\t");
             fname = columns[0];
             json = columns[1];
-            paragraphId = columns[2]
+            paragraphId = columns[2];
 
             output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", ".json");
 
