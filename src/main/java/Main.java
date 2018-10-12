@@ -46,7 +46,7 @@ public class Main {
             fname = columns[0];
             json = columns[1];
             paragraphId = columns[2];
-            output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", ".json");
+            output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", ".tsv");
 
             // write
             try (FileWriter outWriter = new FileWriter(output_path, true); 
