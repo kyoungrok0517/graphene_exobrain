@@ -17,7 +17,7 @@ public class RelationExtractor {
         this.graphene = new Graphene();
 
         File directory = new File(this.output_dir);
-        if (! directory.exists()){
+        if (!directory.exists()) {
             directory.mkdir();
         }
     }
@@ -31,14 +31,15 @@ public class RelationExtractor {
         try {
             String content = new String(Files.readAllBytes(Paths.get(file.toString())));
             RelationExtractionContent res = this.graphene.doRelationExtraction(content, true, false);
-            String output_file = Paths.get(this.output_dir, file.getFileName().toString()).toString().replace(".txt", ".json");
+            String output_file = Paths.get(this.output_dir, file.getFileName().toString()).toString().replace(".txt",
+                    ".json");
             res.serializeToJSON(new File(output_file));
         } catch (IOException e) {
             System.err.println(e);
         } catch (Exception e) {
             System.err.println(e);
         } finally {
-            return;
+
         }
 
     }

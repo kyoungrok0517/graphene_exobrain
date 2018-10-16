@@ -43,13 +43,14 @@ public class GrapheneWorker implements Runnable {
                         continue;
                     }
 
-                    columns = line.split("\\t");
-                    sentence = columns[0];
-                    paragraphId = columns[1];
+                    sentence = line.trim();
+                    // columns = line.split("\\t");
+                    // sentence = columns[0];
+                    // paragraphId = columns[1];
                     try {
                         json = this.graphene.doRelationExtraction(sentence, false, false).serializeToJSON();
                         fileName = filePath.getFileName().toString();
-                        outQueue.add(fileName + '\t' + json + '\t' + paragraphId);
+                        outQueue.add(fileName + '\t' + json);
                     } catch (RuntimeInterruptedException e) {
                         System.err.println("Error: " + filePath.getFileName().toString());
                     } catch (Exception e) {
