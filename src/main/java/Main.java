@@ -50,7 +50,7 @@ public class Main {
             output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", OUTPUT_EXT);
 
             // write
-            try (FileWriter outWriter = new FileWriter(output_path, true); 
+            try (FileWriter outWriter = new FileWriter(output_path, true);
                     PrintWriter outPrinter = new PrintWriter(outWriter)) {
                 // outPrinter.println(json + '\t' + paragraphId);
                 outPrinter.println(json);
