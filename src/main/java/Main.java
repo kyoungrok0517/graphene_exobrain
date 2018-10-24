@@ -26,7 +26,7 @@ public class Main {
     public static LinkedBlockingQueue<String> queue = new LinkedBlockingQueue<>();
     public static LinkedBlockingQueue<String> outs = new LinkedBlockingQueue<>();
     public static LinkedBlockingQueue<String> inProgressQueue = new LinkedBlockingQueue<>();
-    public static String OUTPUT_EXT = ".tsv";
+    public static String OUTPUT_EXT = ".json";
 
     public static void putIntoQueue(String inputFile) {
         try {
@@ -40,19 +40,20 @@ public class Main {
         String[] columns;
         String fname;
         String json;
-        String paragraphId;
+        // String paragraphId;
         String output_path;
         for (String result : outs) {
             columns = result.split("\\t");
             fname = columns[0];
             json = columns[1];
-            paragraphId = columns[2];
+            // paragraphId = columns[2];
             output_path = Paths.get(finishedDir.toString(), fname).toString().replace(".txt", OUTPUT_EXT);
 
             // write
             try (FileWriter outWriter = new FileWriter(output_path, true); 
                     PrintWriter outPrinter = new PrintWriter(outWriter)) {
-                outPrinter.println(json + '\t' + paragraphId);
+                // outPrinter.println(json + '\t' + paragraphId);
+                outPrinter.println(json);
                 outPrinter.flush();
             } catch (IOException e) {
                 e.printStackTrace();
